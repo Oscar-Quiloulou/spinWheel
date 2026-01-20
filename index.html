@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Roue aléatoire - Mode CHAOS Arc-en-ciel</title>
+<title>Roue aléatoire - Style Propre & Fun</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -10,7 +10,7 @@
 /* ------------------- THEME FUN ------------------ */
 /* ------------------------------------------------ */
 :root {
-  --bg: #fffbf0;
+  --bg: #fff7e6;
   --card: #ffffff;
   --text: #333;
   --accent: #ff3e7f;
@@ -50,12 +50,6 @@ body {
   border-radius: 18px;
   box-shadow: 0 10px 25px #0002;
   border: 3px solid #ffb80055;
-  animation: cardFloat 4s ease-in-out infinite;
-}
-
-@keyframes cardFloat {
-  0%,100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
 }
 
 /* ------------------------------------------------ */
@@ -67,17 +61,42 @@ body {
   justify-content: center;
 }
 
+/* Halo léger autour de la roue */
+.wheel-container::after {
+  content: "";
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #ff3e7f,
+    #ffb800,
+    #00c6ff,
+    #ff3e7f
+  );
+  filter: blur(40px);
+  opacity: 0.25;
+  z-index: -1;
+  animation: spinHalo 12s linear infinite;
+}
+
+@keyframes spinHalo {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Canvas stylé */
 canvas {
   max-width: 100%;
-  filter: drop-shadow(0 0 12px #ff3e7f88);
-  animation: wheelGlow 3s infinite alternate;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffffaa, #00000011);
+  box-shadow:
+    0 0 20px #ff3e7f55,
+    inset 0 0 20px #ffffffaa,
+    inset 0 0 40px #00000033;
 }
 
-@keyframes wheelGlow {
-  from { filter: drop-shadow(0 0 6px #ff3e7f55); }
-  to   { filter: drop-shadow(0 0 18px #ff3e7faa); }
-}
-
+/* Pointe */
 .pointer {
   position: absolute;
   top: 50%;
@@ -142,7 +161,7 @@ canvas {
 
 @keyframes rainbowPulse {
   0% { filter: hue-rotate(0deg) brightness(1); }
-  50% { filter: hue-rotate(180deg) brightness(1.3); }
+  50% { filter: hue-rotate(180deg) brightness(1.2); }
   100% { filter: hue-rotate(360deg) brightness(1); }
 }
 
@@ -207,7 +226,7 @@ input {
 
 <!-- -------------------- WHEEL CARD -------------------- -->
 <div class="card">
-  <h2 style="text-align:center; font-size:1.8rem; color:#ff3e7f;">🎉 Roue CHAOS Arc-en-ciel 🎉</h2>
+  <h2 style="text-align:center; font-size:1.8rem; color:#ff3e7f;">🎉 Roue Stylée 🎉</h2>
 
   <div class="wheel-container">
     <canvas id="wheel" width="420" height="420"></canvas>
@@ -239,7 +258,7 @@ input {
 <!-- -------------------- JS -------------------- -->
 <script>
 /* -------------------- STORAGE -------------------- */
-const STORAGE_KEY = "roulette_prenoms_chaosA";
+const STORAGE_KEY = "roulette_prenoms_styled";
 let names = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
 function save() {
@@ -340,12 +359,24 @@ function drawWheel() {
     const start = i * slice;
     const end = start + slice;
 
+    /* Dégradé stylé */
+    const grad = ctx.createLinearGradient(0, 0, radius, radius);
+    grad.addColorStop(0, randomColor(i));
+    grad.addColorStop(1, "#ffffff55");
+    ctx.fillStyle = grad;
+
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, radius - 10, start, end);
-    ctx.fillStyle = randomColor(i);
+    ctx.closePath();
     ctx.fill();
 
+    /* Contours visibles */
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#fff";
+    ctx.stroke();
+
+    /* Texte */
     ctx.save();
     ctx.rotate(start + slice / 2);
     ctx.textAlign = "right";
@@ -366,7 +397,7 @@ function getWinner(angle) {
 
 /* -------------------- CONFETTIS -------------------- */
 function spawnConfetti() {
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 80; i++) {
     const c = document.createElement("div");
     c.className = "confetti";
     c.style.left = Math.random() * 100 + "vw";
